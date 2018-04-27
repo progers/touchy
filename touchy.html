@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<style>
+html {
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+  overscroll-behavior: none;
+}
+body { margin: 0; }
+</style>
+<script>
+  class Thing {
+    constructor(x, y) {
+      this.x = x;
+      this.y = y;
+      this.dx = (Math.random() * 20) - 20 / 2;
+      this.dy = (Math.random() * 20) - 20 / 2;
+      this.width = 15;
+      this.height = 15;
+      this.r = Math.random() * Math.PI * 2;
+      this.dr = (Math.random() * 0.8) - 0.8 / 2;
+      this.color = '#'+Math.random().toString(16).substr(-6);
+      this.life = 50;
+
+      this.element = document.createElement('div');
+      this.element.style.width = this.width + 'px';
+      this.element.style.height = this.height + 'px';
+      this.element.style.background = this.color;
+      this.element.style.position = 'absolute';
+      this.element.style.willChange = 'transform';
+      document.documentElement.appendChild(this.element);
+    }
+
+    update() {
+      if (--this.life <= 0) {
+        this.remove();
+        return false;
+      }
+
+      this.dr *= 0.97;
+      this.r += this.dr;
+      this.x += this.dx;
+      this.y += this.dy;
+
+      var transX = this.x - this.width / 2;
+      var transY = this.y - this.height / 2;
+      var trans = `translate(${transX}px, ${transY}px)`;
+      var rotate = `rotateZ(${this.r}rad)`;
+      var scale = `scale(${this.life / 25})`;
+      this.element.style.transform = `${trans} ${rotate} ${scale}`;
+      this.element.style.opacity = this.life / 50;
+      return true;
+    }
+
+    remove() {
+      this.element.parentElement.removeChild(this.element);
+    }
+  }
+
+  var things = [];
+  var animating = false;
+  function spawnThings(x, y) {
+    var addMultiplier = 3; // Add multiple things per spawn.
+    for (var i = 0; i < addMultiplier; i++)
+      things.push(new Thing(x, y));
+    if (!animating)
+      requestAnimationFrame(updateThings);
+  }
+
+  function updateThings(frameTime) {
+    // Cull a percentage of the things if framerate drops below 5ms.
+    if (performance.now() - frameTime > 5) {
+      var cullCount = Math.floor(things.length * 0.1);
+      for (var cull = 0; cull < cullCount; cull++) {
+        var cullIndex = Math.floor(Math.random() * things.length);
+        things[cullIndex].remove();
+        things.splice(cullIndex, 1);
+      }
+    }
+
+    for (var idx in things) {
+      if (!things[idx].update())
+        things.splice(idx, 1);
+    }
+
+    animating = things.length !== 0;
+    if (animating)
+      requestAnimationFrame(updateThings);
+  }
+
+  document.documentElement.addEventListener('touchstart', function(e) {
+    for (var idx = 0; idx < e.touches.length; idx++)
+      spawnThings(e.touches[idx].clientX, e.touches[idx].clientY);
+  });
+  document.documentElement.addEventListener('touchmove', function(e) {
+    for (var idx = 0; idx < e.touches.length; idx++)
+      spawnThings(e.touches[idx].clientX, e.touches[idx].clientY);
+  });
+  document.documentElement.addEventListener('mousedown', function(e) {
+    spawnThings(e.clientX, e.clientY);
+  });
+  document.documentElement.addEventListener('mousemove', function(e) {
+    spawnThings(e.clientX, e.clientY);
+  });
+
+  var attemptedFullscreen = false;
+  document.documentElement.addEventListener('click', function(e) {
+    if (!attemptedFullscreen)
+      document.documentElement.webkitRequestFullscreen();
+    attemptedFullscreen = true;
+  });
+</script>
