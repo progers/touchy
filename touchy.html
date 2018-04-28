@@ -59,24 +59,27 @@
   }
 
   var things = [];
-  var animating = false;
   function spawnThings(x, y) {
     var addMultiplier = 3; // Add multiple things per spawn.
     for (var i = 0; i < addMultiplier; i++)
       things.push(new Thing(x, y));
-    if (!animating)
-      requestAnimationFrame(updateThings);
   }
 
+  var framerate = 0;
+  var lastFrameTime = performance.now();
   function updateThings(time) {
-    // Cull a percentage of the things if framerate drops below 5ms.
-    if (performance.now() - time > 5) {
-      var cullCount = Math.floor(things.length * 0.1);
-      for (var cull = 0; cull < cullCount; cull++) {
-        var cullIndex = Math.floor(Math.random() * things.length);
-        things[cullIndex].remove();
-        things.splice(cullIndex, 1);
-      }
+    // Use an exponential moving average of the last 3 frames for the framerate.
+    framerate = framerate * 2 / 3 + (time - lastFrameTime) / 3;
+    lastFrameTime = time;
+
+    // Cull a percentage when frames are missed.
+    var missedFrames = Math.max(Math.floor(framerate / 16.67), 0);
+    var cullPercent = Math.min(Math.pow(missedFrames, 2) / 100, 0.1);
+    var cullCount = Math.floor(things.length * cullPercent);
+    for (var cull = 0; cull < cullCount; cull++) {
+      var cullIndex = Math.floor(Math.random() * things.length);
+      things[cullIndex].remove();
+      things.splice(cullIndex, 1);
     }
 
     for (var idx in things) {
@@ -84,10 +87,9 @@
         things.splice(idx, 1);
     }
 
-    animating = things.length !== 0;
-    if (animating)
-      requestAnimationFrame(updateThings);
+    requestAnimationFrame(updateThings);
   }
+  requestAnimationFrame(updateThings);
 
   document.documentElement.addEventListener('touchstart', function(e) {
     for (var idx = 0; idx < e.touches.length; idx++)
