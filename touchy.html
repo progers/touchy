@@ -30,11 +30,12 @@
       this.element.style.background = this.color;
       this.element.style.position = 'absolute';
       this.element.style.willChange = 'transform';
+      this.update(this.t0);
       document.documentElement.appendChild(this.element);
     }
 
-    update() {
-      var time = performance.now() - this.t0;
+    update(time) {
+      time = time - this.t0;
 
       var maxTime = 1000;
       if (time > maxTime) {
@@ -67,9 +68,9 @@
       requestAnimationFrame(updateThings);
   }
 
-  function updateThings(frameTime) {
+  function updateThings(time) {
     // Cull a percentage of the things if framerate drops below 5ms.
-    if (performance.now() - frameTime > 5) {
+    if (performance.now() - time > 5) {
       var cullCount = Math.floor(things.length * 0.1);
       for (var cull = 0; cull < cullCount; cull++) {
         var cullIndex = Math.floor(Math.random() * things.length);
@@ -79,7 +80,7 @@
     }
 
     for (var idx in things) {
-      if (!things[idx].update())
+      if (!things[idx].update(time))
         things.splice(idx, 1);
     }
 
