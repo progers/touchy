@@ -100,11 +100,7 @@
     spawnThings(e.clientX, e.clientY);
   });
 
-
-  var attemptedFullscreen = false;
   document.documentElement.addEventListener('click', function(e) {
-    if (!attemptedFullscreen)
-      document.documentElement.webkitRequestFullscreen();
-    attemptedFullscreen = true;
+    document.documentElement.webkitRequestFullscreen();
   });
 </script>
