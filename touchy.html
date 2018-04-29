@@ -30,8 +30,6 @@
       this.element.style.background = this.color;
       this.element.style.position = 'absolute';
       this.element.style.willChange = 'transform';
-      this.update(this.t0);
-      document.documentElement.appendChild(this.element);
     }
 
     update(currentTime) {
@@ -50,6 +48,8 @@
       var scale = `scale(${(maxTime - time) / maxTime})`;
       this.element.style.transform = `${trans} ${rotate} ${scale}`;
       this.element.style.opacity = (maxTime - time) / maxTime;
+      if (!this.element.parentElement)
+        document.documentElement.appendChild(this.element);
       return true;
     }
 
