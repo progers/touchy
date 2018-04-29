@@ -61,7 +61,7 @@
 
   var things = [];
   function spawnThings(x, y) {
-    var addMultiplier = 3; // Add multiple things per spawn.
+    var addMultiplier = 5; // Add multiple things per spawn.
     for (var i = 0; i < addMultiplier; i++)
       things.push(new Thing(x, y));
   }
@@ -91,20 +91,16 @@
   }
   requestAnimationFrame(updateThings);
 
-  document.documentElement.addEventListener('touchstart', function(e) {
-    for (var idx = 0; idx < e.touches.length; idx++)
-      spawnThings(e.touches[idx].clientX, e.touches[idx].clientY);
-  });
+
   document.documentElement.addEventListener('touchmove', function(e) {
     for (var idx = 0; idx < e.touches.length; idx++)
       spawnThings(e.touches[idx].clientX, e.touches[idx].clientY);
-  });
-  document.documentElement.addEventListener('mousedown', function(e) {
-    spawnThings(e.clientX, e.clientY);
-  });
+    e.preventDefault();
+  }, {passive: false});
   document.documentElement.addEventListener('mousemove', function(e) {
     spawnThings(e.clientX, e.clientY);
   });
+
 
   var attemptedFullscreen = false;
   document.documentElement.addEventListener('click', function(e) {
