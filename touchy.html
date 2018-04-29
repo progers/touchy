@@ -74,13 +74,12 @@
     lastFrameTime = time;
 
     // Cull a percentage when frames are missed.
-    var missedFrames = Math.max(Math.floor(framerate / 16.67), 0);
+    var missedFrames = Math.max(Math.floor(framerate / 17), 0);
     var cullPercent = Math.min(Math.pow(missedFrames, 2) / 100, 0.1);
     var cullCount = Math.floor(things.length * cullPercent);
-    for (var cull = 0; cull < cullCount; cull++) {
-      var cullIndex = Math.floor(Math.random() * things.length);
-      things[cullIndex].remove();
-      things.splice(cullIndex, 1);
+    for (var cull = 0; cull < cullCount && things.length > 0; cull++) {
+      things[0].remove();
+      things.splice(0, 1);
     }
 
     for (var idx in things) {
