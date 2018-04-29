@@ -30,12 +30,12 @@
       this.element.style.background = this.color;
       this.element.style.position = 'absolute';
       this.element.style.willChange = 'transform';
-      this.update();
+      this.update(this.t0);
       document.documentElement.appendChild(this.element);
     }
 
-    update() {
-      var time = performance.now() - this.t0;
+    update(currentTime) {
+      var time = currentTime - this.t0;
 
       var maxTime = 1000;
       if (time > maxTime) {
@@ -83,7 +83,7 @@
     }
 
     for (var idx in things) {
-      if (!things[idx].update())
+      if (!things[idx].update(time))
         things.splice(idx, 1);
     }
 
