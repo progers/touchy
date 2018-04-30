@@ -21,33 +21,27 @@
       this.direction = Math.random() * 2 * Math.PI; // (rad)
       this.velocity = Math.random() * (0.6 - 0.3) + 0.3; // (px/ms)
       this.rotationalVelocity = Math.random() * 0.05 - (0.05 / 2); // (rad/ms)
-      this.width = 25;
-      this.height = 25;
       this.element = document.createElement('div');
-      this.element.style.width = this.width + 'px';
-      this.element.style.height = this.height + 'px';
-      var colors = ['#F0C', '#F00', '#FC0', '#8F0', '#0F4', '#0FF', '#04F', '#80F', '#F0C', '#F00'];
-      this.element.style.background = colors[Math.floor(Math.random() * colors.length)];
+      this.element.style.width = Thing.width+ 'px';
+      this.element.style.height = Thing.height + 'px';
+      this.element.style.background = Thing.palette[Math.floor(Math.random() * Thing.palette.length)];
       this.element.style.position = 'absolute';
       this.element.style.willChange = 'transform';
     }
 
     update(currentTime) {
       var time = currentTime - this.t0;
-
-      var maxTime = 1000;
-      if (time > maxTime) {
+      if (time > Thing.lifeTime) {
         this.remove();
         return false;
       }
 
       var x = this.x0 + this.velocity * Math.cos(this.direction) * time;
       var y = this.y0 + this.velocity * Math.sin(this.direction) * time;
-      var trans = `translate(${x - this.width / 2}px, ${y - this.height / 2}px)`;
+      var trans = `translate(${x - Thing.width / 2}px, ${y - Thing.height / 2}px)`;
       var rotate = `rotate(${this.r0 + this.rotationalVelocity * time}rad)`;
-      var scale = `scale(${Math.max((maxTime - time) / maxTime, 0)})`;
+      var scale = `scale(${Math.max((Thing.lifeTime - time) / Thing.lifeTime, 0)})`;
       this.element.style.transform = `${trans} ${rotate} ${scale}`;
-      this.element.style.opacity = Math.max((maxTime - time) / maxTime, 0.01);
       if (!this.element.parentElement)
         document.documentElement.appendChild(this.element);
       return true;
@@ -58,6 +52,10 @@
         this.element.parentElement.removeChild(this.element);
     }
   }
+  Thing.width = 25; // (px)
+  Thing.height = 25; // (px)
+  Thing.lifeTime = 1000; // Max time until Thing is destroyed (ms)
+  Thing.palette = ['#F0C', '#F00', '#FC0', '#8F0', '#0F4', '#0FF', '#04F', '#80F', '#F0C', '#F00']; // Color palette
 
   var things = [];
   function spawnThings(x, y) {
@@ -89,7 +87,6 @@
     requestAnimationFrame(updateThings);
   }
   requestAnimationFrame(updateThings);
-
 
   document.documentElement.addEventListener('touchmove', function(e) {
     for (var idx = 0; idx < e.touches.length; idx++)
