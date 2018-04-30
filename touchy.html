@@ -30,17 +30,17 @@
     }
 
     update(currentTime) {
-      var time = currentTime - this.t0;
+      let time = currentTime - this.t0;
       if (time > Thing.lifeTime) {
         this.remove();
         return false;
       }
 
-      var x = this.x0 + this.velocity * Math.cos(this.direction) * time;
-      var y = this.y0 + this.velocity * Math.sin(this.direction) * time;
-      var trans = `translate(${x - Thing.width / 2}px, ${y - Thing.height / 2}px)`;
-      var rotate = `rotate(${this.r0 + this.rotationalVelocity * time}rad)`;
-      var scale = `scale(${Math.max((Thing.lifeTime - time) / Thing.lifeTime, 0)})`;
+      let x = this.x0 + this.velocity * Math.cos(this.direction) * time;
+      let y = this.y0 + this.velocity * Math.sin(this.direction) * time;
+      let trans = `translate(${x - Thing.width / 2}px, ${y - Thing.height / 2}px)`;
+      let rotate = `rotate(${this.r0 + this.rotationalVelocity * time}rad)`;
+      let scale = `scale(${Math.max((Thing.lifeTime - time) / Thing.lifeTime, 0)})`;
       this.element.style.transform = `${trans} ${rotate} ${scale}`;
       if (!this.element.parentElement)
         document.documentElement.appendChild(this.element);
@@ -57,30 +57,30 @@
   Thing.lifeTime = 1000; // Max time until Thing is destroyed (ms)
   Thing.palette = ['#F0C', '#F00', '#FC0', '#8F0', '#0F4', '#0FF', '#04F', '#80F', '#F0C', '#F00']; // Color palette
 
-  var things = [];
+  let things = [];
   function spawnThings(x, y) {
-    var addMultiplier = 5; // Add multiple things per spawn.
-    for (var i = 0; i < addMultiplier; i++)
+    let addMultiplier = 5; // Add multiple things per spawn.
+    for (let i = 0; i < addMultiplier; i++)
       things.push(new Thing(x, y));
   }
 
-  var framerate = 0;
-  var lastFrameTime = performance.now();
+  let framerate = 0;
+  let lastFrameTime = performance.now();
   function updateThings(time) {
     // Use an exponential moving average of the last 3 frames for the framerate.
     framerate = framerate * 2 / 3 + (time - lastFrameTime) / 3;
     lastFrameTime = time;
 
     // Cull a percentage when frames are missed.
-    var missedFrames = Math.max(Math.floor(framerate / 17), 0);
-    var cullPercent = Math.min(Math.pow(missedFrames, 2) / 100, 0.1);
-    var cullCount = Math.floor(things.length * cullPercent);
-    for (var cull = 0; cull < cullCount && things.length > 0; cull++) {
+    let missedFrames = Math.max(Math.floor(framerate / 17), 0);
+    let cullPercent = Math.min(Math.pow(missedFrames, 2) / 100, 0.1);
+    let cullCount = Math.floor(things.length * cullPercent);
+    for (let cull = 0; cull < cullCount && things.length > 0; cull++) {
       things[0].remove();
       things.splice(0, 1);
     }
 
-    for (var idx in things) {
+    for (let idx in things) {
       if (!things[idx].update(time))
         things.splice(idx, 1);
     }
@@ -89,7 +89,7 @@
   requestAnimationFrame(updateThings);
 
   document.documentElement.addEventListener('touchmove', function(e) {
-    for (var idx = 0; idx < e.touches.length; idx++)
+    for (let idx = 0; idx < e.touches.length; idx++)
       spawnThings(e.touches[idx].clientX, e.touches[idx].clientY);
     e.preventDefault();
   }, {passive: false});
